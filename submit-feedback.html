@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Feedback - Customer Support System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: 12px;
+        }
+
+        .navbar li a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .navbar li a:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .form-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+
+        .required {
+            color: #e53e3e;
+        }
+
+        input[type="text"], textarea, select, input[type="number"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .character-counter {
+            font-size: 0.875rem;
+            color: #718096;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        .character-counter.warning {
+            color: #d69e2e;
+        }
+
+        .character-counter.error {
+            color: #e53e3e;
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        /* Validation styles */
+        .field-error {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        input.error, textarea.error, select.error {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.1);
+        }
+
+        input.valid, textarea.valid, select.valid {
+            border-color: #38a169;
+            box-shadow: 0 0 0 4px rgba(56, 161, 105, 0.1);
+        }
+
+        .validation-summary {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .validation-summary.show {
+            display: block;
+        }
+
+        .validation-summary h4 {
+            color: #c53030;
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #c53030;
+        }
+
+        .rating-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .star {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star.active {
+            color: #fbbf24;
+        }
+
+        .star:hover {
+            color: #fbbf24;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            margin-top: 1rem;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        button[type="submit"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            left: -50px;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .navbar li {
+                width: 100%;
+            }
+
+            .navbar li a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                padding: 1.5rem;
+            }
+
+            .form-container {
+                padding: 0 1rem;
+            }
+
+            .form-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .rating-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/user/dashboard">👤 Dashboard</a></li>
+            <li><a href="/tickets/submit">🎟 Submit Ticket</a></li>
+            <li><a href="/user/tickets">📋 My Tickets</a></li>
+            <li><a href="/feedback/submit">💬 Submit Feedback</a></li>
+            <li><a href="/feedback/my-feedback">📝 My Feedback</a></li>
+            <li><a href="/faq">❓ FAQ</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>💬 Submit Feedback</h1>
+</header>
+
+<section class="form-container">
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+
+    <div class="form-card">
+        <div class="form-header">
+            <div class="form-icon">💬</div>
+            <h2 class="form-title">Share Your Feedback</h2>
+            <p class="form-subtitle">Help us improve our service by sharing your thoughts and suggestions</p>
+        </div>
+
+        <form action="/feedback/submit" method="POST" id="feedbackForm" novalidate>
+            <div class="validation-summary" id="validationSummary">
+                <h4>Please fix the following errors:</h4>
+                <ul id="validationErrors"></ul>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject <span class="required">*</span></label>
+                <input type="text" id="subject" name="subject" required placeholder="Brief summary of your feedback" 
+                       minlength="5" maxlength="200" pattern=".{5,200}" 
+                       oninput="updateCharacterCount('subject', 200); validateField('subject')">
+                <div id="subjectCounter" class="character-counter">0 / 200 characters</div>
+                <div class="field-error" id="subjectError">Subject must be between 5 and 200 characters</div>
+                <div class="form-help">Provide a clear and concise subject for your feedback</div>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category <span class="required">*</span></label>
+                <select id="category" name="category" required onchange="validateField('category')">
+                    <option value="">Select a category...</option>
+                    <option value="Service">🛠️ Service Quality</option>
+                    <option value="Product">📦 Product Feedback</option>
+                    <option value="Complaint">😞 Complaint</option>
+                    <option value="Suggestion">💡 Suggestion</option>
+                    <option value="Other">🔧 Other</option>
+                </select>
+                <div class="field-error" id="categoryError">Please select a category</div>
+                <div class="form-help">Choose the category that best describes your feedback</div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Your Feedback <span class="required">*</span></label>
+                <textarea id="message" name="message" required placeholder="Please share your detailed feedback, suggestions, or concerns. Your input helps us improve our service..." 
+                          minlength="10" maxlength="2000" oninput="updateCharacterCount('message', 2000); validateField('message')"></textarea>
+                <div id="messageCounter" class="character-counter">0 / 2000 characters</div>
+                <div class="field-error" id="messageError">Message must be between 10 and 2000 characters</div>
+                <div class="form-help">Be as detailed as possible to help us understand your feedback better</div>
+            </div>
+
+            <div class="form-group">
+                <label for="rating">Rating (Optional)</label>
+                <div class="rating-container">
+                    <div class="rating-stars" id="ratingStars">
+                        <span class="star" data-rating="1">⭐</span>
+                        <span class="star" data-rating="2">⭐</span>
+                        <span class="star" data-rating="3">⭐</span>
+                        <span class="star" data-rating="4">⭐</span>
+                        <span class="star" data-rating="5">⭐</span>
+                    </div>
+                    <span id="ratingText">Click to rate</span>
+                </div>
+                <input type="hidden" id="rating" name="rating" value="" min="1" max="5">
+                <div class="field-error" id="ratingError">Rating must be between 1 and 5</div>
+                <div class="form-help">Rate your overall experience (1-5 stars)</div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isAnonymous" name="isAnonymous" value="true">
+                    <label for="isAnonymous" class="checkbox-label">Submit anonymously</label>
+                </div>
+                <div class="form-help">Check this box if you prefer to submit feedback anonymously</div>
+            </div>
+
+            <button type="submit">🚀 Submit Feedback</button>
+        </form>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function updateCharacterCount(fieldId, maxLength) {
+        const field = document.getElementById(fieldId);
+        const counter = document.getElementById(fieldId + 'Counter');
+        const currentLength = field.value.length;
+        
+        counter.textContent = `${currentLength} / ${maxLength} characters`;
+        
+        // Update counter color based on usage
+        counter.classList.remove('warning', 'error');
+        if (currentLength > maxLength * 0.9) {
+            counter.classList.add('error');
+        } else if (currentLength > maxLength * 0.75) {
+            counter.classList.add('warning');
+        }
+    }
+
+    // Rating functionality
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+    const ratingText = document.getElementById('ratingText');
+
+    stars.forEach((star, index) => {
+        star.addEventListener('click', () => {
+            const rating = index + 1;
+            ratingInput.value = rating;
+            
+            // Update star display
+            stars.forEach((s, i) => {
+                s.classList.toggle('active', i < rating);
+            });
+            
+            // Update rating text
+            const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            ratingText.textContent = ratingLabels[rating];
+        });
+
+        star.addEventListener('mouseenter', () => {
+            const rating = index + 1;
+            stars.forEach((s, i) => {
+                s.classList.toggle('active', i < rating);
+            });
+        });
+    });
+
+    // Reset stars on mouse leave
+    document.getElementById('ratingStars').addEventListener('mouseleave', () => {
+        const currentRating = parseInt(ratingInput.value) || 0;
+        stars.forEach((s, i) => {
+            s.classList.toggle('active', i < currentRating);
+        });
+    });
+
+    // Initialize character counters
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCharacterCount('subject', 200);
+        updateCharacterCount('message', 2000);
+    });
+
+    // Real-time field validation
+    function validateField(fieldName) {
+        const field = document.getElementById(fieldName);
+        const errorElement = document.getElementById(fieldName + 'Error');
+        let isValid = true;
+        let errorMessage = '';
+
+        // Remove previous validation classes
+        field.classList.remove('error', 'valid');
+        errorElement.classList.remove('show');
+
+        switch(fieldName) {
+            case 'subject':
+                const subject = field.value.trim();
+                if (!subject) {
+                    isValid = false;
+                    errorMessage = 'Subject is required';
+                } else if (subject.length < 5) {
+                    isValid = false;
+                    errorMessage = 'Subject must be at least 5 characters';
+                } else if (subject.length > 200) {
+                    isValid = false;
+                    errorMessage = 'Subject cannot exceed 200 characters';
+                }
+                break;
+
+            case 'category':
+                if (!field.value) {
+                    isValid = false;
+                    errorMessage = 'Please select a category';
+                }
+                break;
+
+            case 'message':
+                const message = field.value.trim();
+                if (!message) {
+                    isValid = false;
+                    errorMessage = 'Message is required';
+                } else if (message.length < 10) {
+                    isValid = false;
+                    errorMessage = 'Message must be at least 10 characters';
+                } else if (message.length > 2000) {
+                    isValid = false;
+                    errorMessage = 'Message cannot exceed 2000 characters';
+                }
+                break;
+
+            case 'rating':
+                const rating = parseInt(field.value);
+                if (field.value && (rating < 1 || rating > 5)) {
+                    isValid = false;
+                    errorMessage = 'Rating must be between 1 and 5';
+                }
+                break;
+        }
+
+        if (!isValid) {
+            field.classList.add('error');
+            errorElement.textContent = errorMessage;
+            errorElement.classList.add('show');
+        } else {
+            field.classList.add('valid');
+        }
+
+        return isValid;
+    }
+
+    // Validate all fields
+    function validateForm() {
+        const fields = ['subject', 'category', 'message'];
+        let allValid = true;
+        const errors = [];
+
+        fields.forEach(fieldName => {
+            if (!validateField(fieldName)) {
+                allValid = false;
+                const field = document.getElementById(fieldName);
+                const errorElement = document.getElementById(fieldName + 'Error');
+                errors.push(errorElement.textContent);
+            }
+        });
+
+        // Check rating if provided
+        const rating = document.getElementById('rating').value;
+        if (rating && !validateField('rating')) {
+            allValid = false;
+            const errorElement = document.getElementById('ratingError');
+            errors.push(errorElement.textContent);
+        }
+
+        return { valid: allValid, errors: errors };
+    }
+
+    // Form validation
+    document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const validation = validateForm();
+        
+        if (!validation.valid) {
+            // Show validation summary
+            const summary = document.getElementById('validationSummary');
+            const errorsList = document.getElementById('validationErrors');
+            
+            errorsList.innerHTML = '';
+            validation.errors.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                errorsList.appendChild(li);
+            });
+            
+            summary.classList.add('show');
+            summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        // Hide validation summary if form is valid
+        document.getElementById('validationSummary').classList.remove('show');
+        
+        // Show loading state
+        const submitBtn = document.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Submitting...';
+        
+        // Submit the form
+        this.submit();
+    });
+</script>
+</body>
+</html>

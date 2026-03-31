@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Customer Support System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: 12px;
+        }
+
+        .navbar li a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .navbar li a:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .faq-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .faq-header h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-header p {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            min-width: 300px;
+        }
+
+        .search-box:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-filter {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: #f7fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-filter:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .faq-question {
+            padding: 2rem;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .faq-category {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 1rem;
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            padding: 0 2rem 2rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .faq-answer-text {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .navbar li {
+                width: 100%;
+            }
+
+            .navbar li a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                padding: 1.5rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .search-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .faq-question {
+                padding: 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .faq-question-text {
+                margin-right: 0;
+            }
+
+            .faq-answer {
+                padding: 0 1.5rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/user/dashboard">👤 Dashboard</a></li>
+            <li><a href="/tickets/submit">🎟 Submit Ticket</a></li>
+            <li><a href="/user/tickets">📋 My Tickets</a></li>
+            <li><a href="/faq">❓ FAQ</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>❓ Frequently Asked Questions</h1>
+</header>
+
+<div class="container">
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+
+    <div class="faq-header">
+        <h2>Find Answers to Common Questions</h2>
+        <p>Browse our comprehensive FAQ collection or search for specific topics</p>
+        
+        <div class="search-controls">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search FAQs..." 
+                       th:value="${searchKeyword}" id="searchInput">
+                <button class="search-btn" onclick="searchFAQs()">🔍</button>
+            </div>
+            
+            <select class="category-filter" id="categoryFilter" onchange="filterByCategory()">
+                <option value="all" th:selected="${selectedCategory == null or selectedCategory == 'all'}">All Categories</option>
+                <option th:each="category : ${categories}" 
+                        th:value="${category}" 
+                        th:text="${category}"
+                        th:selected="${selectedCategory == category}"></option>
+            </select>
+        </div>
+    </div>
+
+    <div class="faq-grid" th:if="${not #lists.isEmpty(faqs)}">
+        <div class="faq-item" th:each="faq : ${faqs}">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                    <span class="faq-category" th:text="${faq.category}">Category</span>
+                    <span class="faq-question-text" th:text="${faq.question}">Question goes here</span>
+                </div>
+                <span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-text" th:text="${faq.answer}">Answer goes here</div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(faqs)}" class="empty-state">
+        <div class="empty-state-icon">❓</div>
+        <h3>No FAQs Found</h3>
+        <p th:if="${searchKeyword != null}">No FAQs match your search criteria. Try a different keyword or browse all categories.</p>
+        <p th:if="${searchKeyword == null}">There are currently no FAQ articles available. Check back later for helpful information.</p>
+        <a href="/tickets/submit" class="btn-primary">🎟️ Submit a Question</a>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function toggleFAQ(element) {
+        const faqItem = element.parentElement;
+        const isActive = faqItem.classList.contains('active');
+        
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item.active').forEach(item => {
+            if (item !== faqItem) {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Toggle current FAQ
+        faqItem.classList.toggle('active');
+    }
+
+    function filterByCategory() {
+        const select = document.getElementById('categoryFilter');
+        const category = select.value;
+        const searchKeyword = document.getElementById('searchInput').value;
+        
+        let url = '/faq';
+        const params = new URLSearchParams();
+        
+        if (category && category !== 'all') {
+            params.append('category', category);
+        }
+        
+        if (searchKeyword && searchKeyword.trim() !== '') {
+            params.append('search', searchKeyword.trim());
+        }
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+        
+        window.location.href = url;
+    }
+
+    function searchFAQs() {
+        const searchKeyword = document.getElementById('searchInput').value;
+        const category = document.getElementById('categoryFilter').value;
+        
+        let url = '/faq';
+        const params = new URLSearchParams();
+        
+        if (searchKeyword && searchKeyword.trim() !== '') {
+            params.append('search', searchKeyword.trim());
+        }
+        
+        if (category && category !== 'all') {
+            params.append('category', category);
+        }
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+        
+        window.location.href = url;
+    }
+
+    // Allow Enter key to trigger search
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchFAQs();
+        }
+    });
+
+    // Auto-expand FAQ if there's only one result
+    document.addEventListener('DOMContentLoaded', function() {
+        const faqItems = document.querySelectorAll('.faq-item');
+        if (faqItems.length === 1) {
+            faqItems[0].classList.add('active');
+        }
+    });
+</script>
+</body>
+</html>

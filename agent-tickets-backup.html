@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent - View Tickets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: 12px;
+        }
+
+        .navbar li a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .navbar li a:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        section {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem 3rem;
+        }
+
+        section > p {
+            text-align: center;
+            font-size: 1.1rem;
+            color: white;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        th {
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            white-space: nowrap;
+        }
+
+        thead tr th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        thead tr th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: scale(1.01);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        select {
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #4a5568;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            min-height: 80px;
+        }
+
+        textarea:hover {
+            border-color: #667eea;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        form {
+            margin-top: 0.5rem;
+        }
+
+        .response-section {
+            background: rgba(102, 126, 234, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .response-section h4 {
+            color: #667eea;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .response-section p {
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .response-section strong {
+            color: #2d3748;
+        }
+
+        .response-section hr {
+            border: none;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+            margin-top: 0.75rem;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .navbar li {
+                width: 100%;
+            }
+
+            .navbar li a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 2rem;
+                padding: 1.5rem;
+            }
+
+            .table-container {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/agent/dashboard">📞 Dashboard</a></li>
+            <li><a href="/agent/tickets">📋 My Tickets</a></li>
+            <li><a href="/agent/faq">❓ Manage FAQ</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>📋 Submitted Tickets</h1>
+</header>
+
+<section>
+    <p>Here you can see all tickets submitted by users:</p>
+
+    <div class="table-container">
+        <table border="0" cellpadding="0" cellspacing="0">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Submitted By</th>
+                <th>Created At</th>
+                <th>Action</th>
+                <th>Response</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ticket : ${tickets}">
+                <td th:text="${ticket.id}"></td>
+                <td th:text="${ticket.title}"></td>
+                <td th:text="${ticket.description}"></td>
+                <td th:text="${ticket.category}"></td>
+                <td th:text="${ticket.status}"></td>
+                <td th:text="${ticket.user.username}"></td>
+                <td th:text="${ticket.createdAt}"></td>
+                <td>
+                    <form th:action="@{'/tickets/update-status/' + ${ticket.id}}" method="post" th:id="'statusForm-' + ${ticket.id}">
+                        <select name="status" required th:id="'status-' + ${ticket.id}" th:onchange="'checkStatus(' + ${ticket.id} + ')'">
+                            <option value="Open" th:selected="${ticket.status == 'Open'}">Open</option>
+                            <option value="In Progress" th:selected="${ticket.status == 'In Progress'}">In Progress</option>
+                            <option value="Resolved" th:selected="${ticket.status == 'Resolved'}">Resolved</option>
+                            <option value="Closed" th:selected="${ticket.status == 'Closed'}">Closed</option>
+                        </select>
+                        <button type="submit" th:onclick="'return validateStatus(' + ${ticket.id} + ')'">Update</button>
+                    </form>
+                </td>
+                <td>
+                    <div th:if="${ticket.responses != null and #lists.size(ticket.responses) > 0}" class="response-section">
+                        <h4>Agent Response:</h4>
+                        <p><strong>Agent:</strong> <span th:text="${ticket.responses[0].agent.username}"></span></p>
+                        <p><strong>Response:</strong> <span th:text="${ticket.responses[0].responseText}"></span></p>
+                        <p><strong>Timestamp:</strong> <span th:text="${ticket.responses[0].createdAt}"></span></p>
+                        <hr/>
+                    </div>
+
+                    <form th:action="@{'/tickets/respond/' + ${ticket.id}}" method="post" th:id="'responseForm-' + ${ticket.id}">
+                        <label><b>Status:</b></label>
+                        <select name="action" required th:id="'action-' + ${ticket.id}">
+                            <option value="In Progress" th:selected="${ticket.status == 'In Progress'}">In Progress</option>
+                            <option value="Resolved" th:selected="${ticket.status == 'Resolved'}">Resolved</option>
+                            <option value="Closed" th:selected="${ticket.status == 'Closed'}">Closed</option>
+                        </select>
+                        <br><br>
+                        <label><b>Response:</b></label>
+                        <textarea name="responseText" th:id="'responseText-' + ${ticket.id}" rows="2" placeholder="Type your response..." required></textarea>
+                        <br>
+                        <button type="submit" th:onclick="'return validateResponse(' + ${ticket.id} + ')'">Send & Update</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function checkStatus(ticketId) {
+        const statusSelect = document.getElementById('status-' + ticketId);
+        const status = statusSelect.value;
+
+        // Prevent the agent from responding if the status is still "Open"
+        const responseText = document.getElementById('responseText-' + ticketId);
+        const submitButton = document.querySelector(`#responseForm-${ticketId} button[type="submit"]`);
+
+        if (status === 'Open') {
+            responseText.disabled = true; // Disable the response textarea
+            submitButton.disabled = true; // Disable the submit button
+        } else {
+            responseText.disabled = false; // Enable the response textarea
+            submitButton.disabled = false; // Enable the submit button
+        }
+    }
+
+    function validateStatus(ticketId) {
+        const statusSelect = document.getElementById('status-' + ticketId);
+        const selectedStatus = statusSelect.value;
+
+        // Prevent submission if the status is not changed from "Open"
+        if (selectedStatus === 'Open') {
+            alert('Please update the status before responding');
+            return false;
+        }
+        return true;
+    }
+
+    function validateResponse(ticketId) {
+        const responseText = document.getElementById('responseText-' + ticketId).value.trim();
+        const actionSelect = document.getElementById('action-' + ticketId);
+        const selectedAction = actionSelect.value;
+
+        // Validate if response text is not empty
+        if (responseText.length === 0) {
+            alert('Please provide a response text');
+            return false;
+        }
+
+        // Validate if a status is selected
+        if (!selectedAction) {
+            alert('Please select a status for the ticket');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar li a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-user {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .badge-agent {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-admin {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .delete-btn {
+            padding: 0.5rem 1rem;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+        }
+
+        .delete-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .edit-btn {
+            padding: 0.5rem 1rem;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .edit-btn:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #e53e3e;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 0.75rem;
+            background: #e2e8f0;
+            color: #2d3748;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #cbd5e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/admin/dashboard">⚡ Dashboard</a></li>
+            <li><a href="/admin/users">👥 Manage Users</a></li>
+            <li><a href="/admin/analytics">📊 Analytics</a></li>
+            <li><a href="/admin/faq/pending">✅ FAQ Approval</a></li>
+            <li><a href="/feedback/admin/all">💬 Feedback</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>👥 Manage Users & Agents</h1>
+</header>
+
+<div class="container">
+    <!-- Statistics Overview -->
+    <div class="stats">
+        <div class="stat-card">
+            <h3 th:text="${users.size()}">0</h3>
+            <p>Total Users</p>
+        </div>
+        <div class="stat-card">
+            <h3 th:text="${agents.size()}">0</h3>
+            <p>Total Agents</p>
+        </div>
+        <div class="stat-card">
+            <h3 th:text="${admins.size()}">0</h3>
+            <p>Total Admins</p>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="section">
+        <h2>👤 Regular Users</h2>
+        <table th:if="${!users.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Phone Number</th>
+                    <th>Address</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}">1</td>
+                    <td th:text="${user.username}">john_doe</td>
+                    <td th:text="${user.phoneNumber}">0771234567</td>
+                    <td th:text="${user.address}">Colombo</td>
+                    <td><span class="badge badge-user">USER</span></td>
+                    <td>
+                        <button class="edit-btn" th:attr="data-user-id=${user.id}" onclick="editUser(this)">
+                            ✏️ Edit
+                        </button>
+                        <button class="delete-btn" th:attr="data-user-id=${user.id}, data-username=${user.username}" onclick="deleteUser(this)">
+                            🗑️ Delete
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${users.isEmpty()}" class="empty-state">
+            No users found
+        </div>
+    </div>
+
+    <!-- Agents Table -->
+    <div class="section">
+        <h2>🎧 Support Agents</h2>
+        <table th:if="${!agents.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Phone Number</th>
+                    <th>Address</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="agent : ${agents}">
+                    <td th:text="${agent.id}">2</td>
+                    <td th:text="${agent.username}">agent_smith</td>
+                    <td th:text="${agent.phoneNumber}">0779876543</td>
+                    <td th:text="${agent.address}">Kandy</td>
+                    <td><span class="badge badge-agent">AGENT</span></td>
+                    <td>
+                        <button class="edit-btn" th:attr="data-user-id=${agent.id}" onclick="editUser(this)">
+                            ✏️ Edit
+                        </button>
+                        <button class="delete-btn" th:attr="data-user-id=${agent.id}, data-username=${agent.username}" onclick="deleteUser(this)">
+                            🗑️ Delete
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${agents.isEmpty()}" class="empty-state">
+            No agents found
+        </div>
+    </div>
+
+    <!-- Admins Table -->
+    <div class="section">
+        <h2>⚡ Administrators</h2>
+        <table th:if="${!admins.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Phone Number</th>
+                    <th>Address</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="admin : ${admins}">
+                    <td th:text="${admin.id}">3</td>
+                    <td th:text="${admin.username}">admin</td>
+                    <td th:text="${admin.phoneNumber}">0771111111</td>
+                    <td th:text="${admin.address}">Galle</td>
+                    <td><span class="badge badge-admin">ADMIN</span></td>
+                    <td>
+                        <button class="edit-btn" th:attr="data-user-id=${admin.id}" onclick="editUser(this)">
+                            ✏️ Edit
+                        </button>
+                        <button class="delete-btn" disabled>
+                            🔒 Protected
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${admins.isEmpty()}" class="empty-state">
+            No administrators found
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>✏️ Edit User Details</h2>
+            <button class="close-btn" onclick="closeEditModal()">&times;</button>
+        </div>
+        
+        <form id="editForm">
+            <input type="hidden" id="editUserId">
+            
+            <div class="form-group">
+                <label for="editUsername">Username</label>
+                <input type="text" id="editUsername" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label for="editPhoneNumber">Phone Number</label>
+                <input type="text" id="editPhoneNumber" pattern="[0-9]{10}" placeholder="e.g., 0771234567" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editAddress">Address</label>
+                <input type="text" id="editAddress" placeholder="Enter address" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editPassword">New Password (Optional)</label>
+                <input type="password" id="editPassword" placeholder="Leave blank to keep current password" minlength="6">
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-save">✔️ Save Changes</button>
+                <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function editUser(button) {
+        const userId = button.getAttribute('data-user-id');
+        
+        // Fetch user details
+        fetch(`/admin/user/${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const user = data.user;
+                    
+                    // Populate form
+                    document.getElementById('editUserId').value = user.id;
+                    document.getElementById('editUsername').value = user.username;
+                    document.getElementById('editPhoneNumber').value = user.phoneNumber;
+                    document.getElementById('editAddress').value = user.address;
+                    document.getElementById('editPassword').value = '';
+                    
+                    // Show modal
+                    document.getElementById('editModal').classList.add('active');
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('❌ Error loading user details: ' + err.message);
+            });
+    }
+    
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
+        document.getElementById('editForm').reset();
+    }
+    
+    // Handle form submission
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const userId = document.getElementById('editUserId').value;
+        const phoneNumber = document.getElementById('editPhoneNumber').value;
+        const address = document.getElementById('editAddress').value;
+        const password = document.getElementById('editPassword').value;
+        
+        const updateData = {
+            phoneNumber: phoneNumber,
+            address: address
+        };
+        
+        // Only include password if it's not empty
+        if (password && password.trim() !== '') {
+            updateData.password = password;
+        }
+        
+        fetch(`/admin/user/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ User updated successfully!');
+                closeEditModal();
+                location.reload();
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('❌ Error updating user: ' + err.message);
+        });
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+    function deleteUser(button) {
+        const userId = button.getAttribute('data-user-id');
+        const username = button.getAttribute('data-username');
+        
+        if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            return;
+        }
+        
+        fetch(`/admin/user/${userId}`, {
+            method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ User deleted successfully!');
+                location.reload();
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('❌ Error deleting user: ' + err.message);
+        });
+    }
+</script>
+</body>
+</html>

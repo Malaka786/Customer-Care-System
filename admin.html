@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Customer Support System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .admin-dashboard {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        thead th {
+            color: white;
+            padding: 1.5rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 1.25rem 1rem;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .user-id {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .username {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .role-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .role-customer {
+            background: #e6fffa;
+            color: #234e52;
+        }
+
+        .role-agent {
+            background: #fef5e7;
+            color: #744210;
+        }
+
+        .role-admin {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #e53e3e;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+                padding: 1.5rem;
+            }
+
+            .admin-dashboard {
+                padding: 0 1rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            thead th,
+            tbody td {
+                padding: 1rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>⚡ Admin Dashboard</h1>
+</header>
+
+<section class="admin-dashboard">
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+
+    <div class="dashboard-header">
+        <h2>👥 User Management</h2>
+        <p>Manage all system users, their roles, and permissions</p>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Sample data - this would be dynamically generated -->
+            <tr>
+                <td class="user-id">#001</td>
+                <td class="username">john_doe</td>
+                <td><span class="role-badge role-customer">Customer</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-edit">✏️ Edit</button>
+                        <button class="btn btn-delete" onclick="confirmDelete('john_doe')">🗑️ Delete</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="user-id">#002</td>
+                <td class="username">jane_smith</td>
+                <td><span class="role-badge role-agent">Agent</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-edit">✏️ Edit</button>
+                        <button class="btn btn-delete" onclick="confirmDelete('jane_smith')">🗑️ Delete</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="user-id">#003</td>
+                <td class="username">admin_user</td>
+                <td><span class="role-badge role-admin">Admin</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-edit">✏️ Edit</button>
+                        <button class="btn btn-delete" disabled title="Cannot delete admin user">🔒 Protected</button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function confirmDelete(username) {
+        if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            // Here you would make an API call to delete the user
+            alert(`User "${username}" would be deleted. (This is a demo)`);
+        }
+    }
+
+    // Disable delete button for protected users
+    document.addEventListener('DOMContentLoaded', function() {
+        const protectedButtons = document.querySelectorAll('.btn-delete[disabled]');
+        protectedButtons.forEach(button => {
+            button.style.opacity = '0.5';
+            button.style.cursor = 'not-allowed';
+            button.onclick = null;
+        });
+    });
+</script>
+</body>
+</html>

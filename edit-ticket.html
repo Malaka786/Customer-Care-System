@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Ticket - Customer Support System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: 12px;
+        }
+
+        .navbar li a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .navbar li a:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .form-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .ticket-info {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .ticket-info h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+
+        .required {
+            color: #e53e3e;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .character-counter {
+            font-size: 0.875rem;
+            color: #718096;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        .character-counter.warning {
+            color: #d69e2e;
+        }
+
+        .character-counter.error {
+            color: #e53e3e;
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button[type="submit"], .btn-secondary {
+            flex: 1;
+            padding: 1.25rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        button[type="submit"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            left: -50px;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .navbar li {
+                width: 100%;
+            }
+
+            .navbar li a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                padding: 1.5rem;
+            }
+
+            .form-container {
+                padding: 0 1rem;
+            }
+
+            .form-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/user/dashboard">👤 Dashboard</a></li>
+            <li><a href="/tickets/submit">🎟 Submit Ticket</a></li>
+            <li><a href="/user/tickets">📋 My Tickets</a></li>
+            <li><a href="/faq">❓ FAQ</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>✏️ Edit Support Ticket</h1>
+</header>
+
+<section class="form-container">
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+
+    <div class="form-card">
+        <div class="form-header">
+            <div class="form-icon">✏️</div>
+            <h2 class="form-title">Edit Support Ticket</h2>
+            <p class="form-subtitle">Update your ticket information below</p>
+        </div>
+
+        <div class="ticket-info">
+            <h3>Ticket Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Ticket ID</div>
+                    <div class="info-value">#<span th:text="${ticket.id}">001</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value" th:text="${ticket.status}">Open</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Created</div>
+                    <div class="info-value" th:text="${#temporals.format(ticket.createdAt, 'dd MMM yyyy HH:mm')}">01 Jan 2025 10:30</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Last Updated</div>
+                    <div class="info-value" th:text="${ticket.updatedAt != null ? #temporals.format(ticket.updatedAt, 'dd MMM yyyy HH:mm') : 'Never'}">Never</div>
+                </div>
+            </div>
+        </div>
+
+        <form th:action="@{/tickets/edit/{id}(id=${ticket.id})}" method="POST" id="ticketForm">
+            <div class="form-group">
+                <label for="title">Ticket Title <span class="required">*</span></label>
+                <input type="text" id="title" name="title" th:value="${ticket.title}" required placeholder="Brief description of your issue" maxlength="150" oninput="updateCharacterCount('title', 150)">
+                <div id="titleCounter" class="character-counter">0 / 150 characters</div>
+                <div class="form-help">Provide a clear and concise title for your support request</div>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category <span class="required">*</span></label>
+                <select id="category" name="category" required>
+                    <option value="">Select a category...</option>
+                    <option value="Technical" th:selected="${ticket.category == 'Technical'}">🔧 Technical Support</option>
+                    <option value="Billing" th:selected="${ticket.category == 'Billing'}">💳 Billing & Payment</option>
+                    <option value="Account" th:selected="${ticket.category == 'Account'}">👤 Account Issues</option>
+                    <option value="General" th:selected="${ticket.category == 'General'}">❓ General Inquiry</option>
+                    <option value="Bug Report" th:selected="${ticket.category == 'Bug Report'}">🐛 Bug Report</option>
+                    <option value="Feature Request" th:selected="${ticket.category == 'Feature Request'}">✨ Feature Request</option>
+                </select>
+                <div class="form-help">Choose the category that best describes your issue</div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Detailed Description <span class="required">*</span></label>
+                <textarea id="description" name="description" th:text="${ticket.description}" required placeholder="Please provide detailed information about your issue, including steps to reproduce, error messages, or any relevant context..." oninput="updateCharacterCount('description', 2000)"></textarea>
+                <div id="descriptionCounter" class="character-counter">0 / 2000 characters</div>
+                <div class="form-help">Include as much relevant detail as possible to help us understand and resolve your issue</div>
+            </div>
+
+            <div class="button-group">
+                <a href="/user/tickets" class="btn-secondary">❌ Cancel</a>
+                <button type="submit">💾 Update Ticket</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function updateCharacterCount(fieldId, maxLength) {
+        const field = document.getElementById(fieldId);
+        const counter = document.getElementById(fieldId + 'Counter');
+        const currentLength = field.value.length;
+        
+        counter.textContent = `${currentLength} / ${maxLength} characters`;
+        
+        // Update counter color based on usage
+        counter.classList.remove('warning', 'error');
+        if (currentLength > maxLength * 0.9) {
+            counter.classList.add('error');
+        } else if (currentLength > maxLength * 0.75) {
+            counter.classList.add('warning');
+        }
+    }
+
+    // Initialize character counters
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCharacterCount('title', 150);
+        updateCharacterCount('description', 2000);
+    });
+
+    // Form validation
+    document.getElementById('ticketForm').addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const category = document.getElementById('category').value;
+        const description = document.getElementById('description').value.trim();
+        
+        if (!title || !category || !description) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        if (title.length > 150) {
+            e.preventDefault();
+            alert('Title cannot exceed 150 characters.');
+            return;
+        }
+        
+        if (description.length > 2000) {
+            e.preventDefault();
+            alert('Description cannot exceed 2000 characters.');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = document.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Updating...';
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Customer Care</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar li a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem 3rem;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 1rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-header h2 {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .role-user {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .role-agent {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:disabled {
+            background: #f7fafc;
+            cursor: not-allowed;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 2px solid #e2e8f0;
+            margin: 2rem 0;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .info-text {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 2px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #feb2b2;
+        }
+
+        .alert.hidden {
+            display: none;
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem 2rem;
+            }
+
+            .profile-card {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li th:if="${user.role == 'ROLE_USER'}"><a href="/user/dashboard">📊 Dashboard</a></li>
+            <li th:if="${user.role == 'ROLE_AGENT'}"><a href="/agent/dashboard">📊 Dashboard</a></li>
+            <li><a href="/profile">👤 Profile</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>👤 My Profile</h1>
+</header>
+
+<div class="container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-icon">👤</div>
+            <h2 th:text="${user.username}">Username</h2>
+            <span class="role-badge" 
+                  th:classappend="${user.role == 'ROLE_USER' ? 'role-user' : 'role-agent'}"
+                  th:text="${user.role == 'ROLE_USER' ? 'User' : 'Agent'}">
+                Role
+            </span>
+        </div>
+
+        <div id="alertBox" class="alert hidden"></div>
+
+        <form id="profileForm">
+            <!-- Account Information -->
+            <div class="section-title">📋 Account Information</div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" th:value="${user.username}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input type="text" id="role" 
+                       th:value="${user.role == 'ROLE_USER' ? 'User' : 'Agent'}" 
+                       disabled>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- Personal Information -->
+            <div class="section-title">📝 Personal Information</div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="text" id="phoneNumber" 
+                       th:value="${user.phoneNumber}" 
+                       pattern="[0-9]{10}" 
+                       placeholder="0771234567" 
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" 
+                       th:value="${user.address}" 
+                       placeholder="Enter your address" 
+                       required>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- Change Password -->
+            <div class="section-title">🔐 Change Password</div>
+            <p class="info-text">Leave password fields empty if you don't want to change your password.</p>
+
+            <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword" 
+                       placeholder="Enter current password" 
+                       minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" 
+                       placeholder="Enter new password (min 6 characters)" 
+                       minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" 
+                       placeholder="Confirm new password" 
+                       minlength="6">
+            </div>
+
+            <button type="submit" class="btn-primary">💾 Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+
+<script>
+    const alertBox = document.getElementById('alertBox');
+
+    function showAlert(message, isSuccess) {
+        alertBox.textContent = (isSuccess ? '✅ ' : '❌ ') + message;
+        alertBox.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+        
+        // Scroll to top to show alert
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Auto-hide after 5 seconds
+        if (isSuccess) {
+            setTimeout(() => {
+                alertBox.classList.add('hidden');
+            }, 5000);
+        }
+    }
+
+    // Password confirmation validation
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = this.value;
+        
+        if (newPassword !== confirmPassword) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Form submission
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const address = document.getElementById('address').value;
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Validate password fields
+        if (newPassword || confirmPassword) {
+            if (!currentPassword) {
+                showAlert('Please enter your current password to change password', false);
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showAlert('New passwords do not match', false);
+                return;
+            }
+        }
+        
+        const updateData = {
+            phoneNumber: phoneNumber,
+            address: address
+        };
+        
+        // Include password fields if changing password
+        if (newPassword && currentPassword) {
+            updateData.currentPassword = currentPassword;
+            updateData.newPassword = newPassword;
+        }
+        
+        fetch('/profile/update', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Profile updated successfully!', true);
+                
+                // Clear password fields
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                // Reload after 2 seconds
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                showAlert(data.message, false);
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            showAlert('Error updating profile: ' + err.message, false);
+        });
+    });
+</script>
+</body>
+</html>

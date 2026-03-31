@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Submitted - Customer Support System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+            animation: bounceIn 0.6s ease;
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .success-message {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .feedback-details {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .feedback-details h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .detail-value {
+            color: #2d3748;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .star {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+
+        .star.empty {
+            color: #e2e8f0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.05) 0%, rgba(56, 161, 105, 0.05) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            right: -50px;
+        }
+
+        .circle-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -30px;
+            left: -30px;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 0 1rem;
+            }
+
+            .success-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .success-title {
+                font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="success-container">
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+
+    <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h1 class="success-title">Feedback Submitted Successfully!</h1>
+        <p class="success-message">
+            Thank you for taking the time to share your feedback with us. Your input is valuable and helps us improve our service.
+        </p>
+
+        <div class="feedback-details" th:if="${feedback}">
+            <h3>Feedback Details</h3>
+            <div class="detail-item">
+                <span class="detail-label">Feedback ID:</span>
+                <span class="detail-value">#<span th:text="${feedback.id}">001</span></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Subject:</span>
+                <span class="detail-value" th:text="${feedback.subject}">Sample Subject</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Category:</span>
+                <span class="detail-value" th:text="${feedback.category}">General</span>
+            </div>
+            <div class="detail-item" th:if="${feedback.rating != null}">
+                <span class="detail-label">Rating:</span>
+                <div class="detail-value">
+                    <div class="rating-display">
+                        <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                              th:class="${i <= feedback.rating} ? 'star' : 'star empty'">⭐</span>
+                        <span th:text="'(' + ${feedback.rating} + '/5)'">(5/5)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Status:</span>
+                <span class="detail-value" th:text="${feedback.status}">New</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Submitted:</span>
+                <span class="detail-value" th:text="${#temporals.format(feedback.createdAt, 'dd MMM yyyy HH:mm')}">01 Jan 2025 10:30</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="/feedback/submit" class="btn-primary">💬 Submit Another Feedback</a>
+            <a href="/feedback/my-feedback" class="btn-secondary">📝 View My Feedback</a>
+            <a href="/user/dashboard" class="btn-secondary">🏠 Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-redirect after 10 seconds (optional)
+    // setTimeout(function() {
+    //     window.location.href = '/feedback/my-feedback';
+    // }, 10000);
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Feedback - Customer Support System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: 12px;
+        }
+
+        .navbar li a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .navbar li a:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .feedback-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .feedback-header h2 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-header p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .feedback-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .feedback-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .feedback-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .feedback-header-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .feedback-title {
+            font-size: 1.2rem;
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-value {
+            font-size: 0.85rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .feedback-category {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-new {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-reviewed {
+            background: #feebc8;
+            color: #7b341e;
+        }
+
+        .status-responded {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-closed {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .feedback-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .star {
+            color: #fbbf24;
+            font-size: 1rem;
+        }
+
+        .star.empty {
+            color: #e2e8f0;
+        }
+
+        .feedback-message {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .admin-response {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .response-title {
+            font-size: 0.9rem;
+            color: #22543d;
+            font-weight: 600;
+        }
+
+        .response-date {
+            font-size: 0.8rem;
+            color: #38a169;
+        }
+
+        .response-content {
+            color: #2d3748;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        footer {
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .navbar li {
+                width: 100%;
+            }
+
+            .navbar li a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                padding: 1.5rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .feedback-header-card {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .feedback-meta {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/user/dashboard">👤 Dashboard</a></li>
+            <li><a href="/tickets/submit">🎟 Submit Ticket</a></li>
+            <li><a href="/user/tickets">📋 My Tickets</a></li>
+            <li><a href="/feedback/submit">💬 Submit Feedback</a></li>
+            <li><a href="/feedback/my-feedback">📝 My Feedback</a></li>
+            <li><a href="/faq">❓ FAQ</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>📝 My Feedback</h1>
+</header>
+
+<div class="container">
+    <div class="feedback-header">
+        <h2>Your Feedback History</h2>
+        <p>Track all your submitted feedback and responses from our team</p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(feedbacks)}" class="feedback-list">
+        <div th:each="feedback : ${feedbacks}" class="feedback-card">
+            <div class="feedback-header-card">
+                <div>
+                    <h3 class="feedback-title" th:text="${feedback.subject}">Sample Feedback Subject</h3>
+                    <div class="feedback-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">ID</span>
+                            <span class="meta-value">#<span th:text="${feedback.id}">001</span></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Category</span>
+                            <span class="feedback-category" th:text="${feedback.category}">General</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Status</span>
+                            <span class="feedback-status" 
+                                  th:classappend="${feedback.status == 'New' ? 'status-new' : 
+                                                 feedback.status == 'Reviewed' ? 'status-reviewed' : 
+                                                 feedback.status == 'Responded' ? 'status-responded' : 'status-closed'}"
+                                  th:text="${feedback.status}">New</span>
+                        </div>
+                        <div class="meta-item" th:if="${feedback.rating != null}">
+                            <span class="meta-label">Rating</span>
+                            <div class="feedback-rating">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                      th:class="${i <= feedback.rating} ? 'star' : 'star empty'">⭐</span>
+                                <span th:text="'(' + ${feedback.rating} + '/5)'">(5/5)</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Date</span>
+                            <span class="meta-value" th:text="${#temporals.format(feedback.createdAt, 'dd MMM yyyy')}">01 Jan 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-message" th:text="${feedback.message}">Sample feedback message content...</div>
+
+            <div th:if="${feedback.adminResponse != null}" class="admin-response">
+                <div class="response-header">
+                    <div class="response-title">Admin Response</div>
+                    <div class="response-date" th:text="${#temporals.format(feedback.adminResponseAt, 'dd MMM yyyy HH:mm')}">01 Jan 2025 10:30</div>
+                </div>
+                <div class="response-content" th:text="${feedback.adminResponse}">Admin response content...</div>
+            </div>
+
+            <div class="feedback-actions" style="margin-top:1rem; display:flex; gap:0.5rem;">
+                <a th:href="@{/feedback/edit/{id}(id=${feedback.id})}" class="btn-primary" style="padding:0.6rem 1rem;">✏️ Edit</a>
+                <form th:action="@{/feedback/delete/{id}(id=${feedback.id})}" method="post" onsubmit="return confirm('Delete this feedback?');">
+                    <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#e53e3e 0%, #c53030 100%); padding:0.6rem 1rem;">🗑️ Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(feedbacks)}" class="empty-state">
+        <div class="empty-state-icon">💬</div>
+        <h3>No Feedback Found</h3>
+        <p>You haven't submitted any feedback yet. Share your thoughts and help us improve our service.</p>
+        <a href="/feedback/submit" class="btn-primary">💬 Submit Your First Feedback</a>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 Customer Support System. All Rights Reserved.</p>
+</footer>
+</body>
+</html>

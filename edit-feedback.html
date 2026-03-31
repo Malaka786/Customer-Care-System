@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Feedback</title>
+    <style>
+        body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#f7fafc; margin:0; }
+        header { background:white; border-bottom:1px solid #e2e8f0; padding:1rem 2rem; }
+        .container { max-width: 900px; margin: 2rem auto; background:white; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:2rem; }
+        h1 { margin:0 0 1rem; color:#2d3748; }
+        .form-grid { display:grid; gap:1rem; }
+        .field { display:flex; flex-direction:column; }
+        label { font-size:.9rem; color:#4a5568; font-weight:600; margin-bottom:.4rem; }
+        input[type=text], select, textarea, input[type=number] { padding:.9rem; border:2px solid #e2e8f0; border-radius:10px; background:#f7fafc; font-size:1rem; }
+        textarea { min-height:140px; resize:vertical; }
+        .actions { margin-top:1.25rem; display:flex; gap:.75rem; }
+        .btn { padding:.8rem 1.4rem; border:none; border-radius:10px; font-weight:700; cursor:pointer; }
+        .primary { background:linear-gradient(135deg,#667eea 0%, #764ba2 100%); color:white; }
+        .secondary { background:#e2e8f0; color:#2d3748; }
+        a.btn { text-decoration:none; display:inline-block; }
+
+        /* Validation styles */
+        .field-error {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        input.error, textarea.error, select.error {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.1);
+        }
+
+        input.valid, textarea.valid, select.valid {
+            border-color: #38a169;
+            box-shadow: 0 0 0 4px rgba(56, 161, 105, 0.1);
+        }
+
+        .validation-summary {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .validation-summary.show {
+            display: block;
+        }
+
+        .validation-summary h4 {
+            color: #c53030;
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .validation-summary ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #c53030;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script>
+        function clampRating(el){ 
+            if(el.value && (el.value<1 || el.value>5)){ 
+                alert('Rating must be between 1 and 5'); 
+                el.focus(); 
+            } 
+        }
+
+        // Real-time field validation
+        function validateField(fieldName) {
+            const field = document.getElementById(fieldName);
+            const errorElement = document.getElementById(fieldName + 'Error');
+            let isValid = true;
+            let errorMessage = '';
+
+            // Remove previous validation classes
+            field.classList.remove('error', 'valid');
+            errorElement.classList.remove('show');
+
+            switch(fieldName) {
+                case 'subject':
+                    const subject = field.value.trim();
+                    if (!subject) {
+                        isValid = false;
+                        errorMessage = 'Subject is required';
+                    } else if (subject.length < 5) {
+                        isValid = false;
+                        errorMessage = 'Subject must be at least 5 characters';
+                    } else if (subject.length > 200) {
+                        isValid = false;
+                        errorMessage = 'Subject cannot exceed 200 characters';
+                    }
+                    break;
+
+                case 'category':
+                    if (!field.value) {
+                        isValid = false;
+                        errorMessage = 'Please select a category';
+                    }
+                    break;
+
+                case 'message':
+                    const message = field.value.trim();
+                    if (!message) {
+                        isValid = false;
+                        errorMessage = 'Message is required';
+                    } else if (message.length < 10) {
+                        isValid = false;
+                        errorMessage = 'Message must be at least 10 characters';
+                    } else if (message.length > 2000) {
+                        isValid = false;
+                        errorMessage = 'Message cannot exceed 2000 characters';
+                    }
+                    break;
+
+                case 'rating':
+                    const rating = parseInt(field.value);
+                    if (field.value && (rating < 1 || rating > 5)) {
+                        isValid = false;
+                        errorMessage = 'Rating must be between 1 and 5';
+                    }
+                    break;
+            }
+
+            if (!isValid) {
+                field.classList.add('error');
+                errorElement.textContent = errorMessage;
+                errorElement.classList.add('show');
+            } else {
+                field.classList.add('valid');
+            }
+
+            return isValid;
+        }
+
+        // Validate all fields
+        function validateForm() {
+            const fields = ['subject', 'category', 'message'];
+            let allValid = true;
+            const errors = [];
+
+            fields.forEach(fieldName => {
+                if (!validateField(fieldName)) {
+                    allValid = false;
+                    const errorElement = document.getElementById(fieldName + 'Error');
+                    errors.push(errorElement.textContent);
+                }
+            });
+
+            // Check rating if provided
+            const rating = document.getElementById('rating').value;
+            if (rating && !validateField('rating')) {
+                allValid = false;
+                const errorElement = document.getElementById('ratingError');
+                errors.push(errorElement.textContent);
+            }
+
+            return { valid: allValid, errors: errors };
+        }
+
+        // Form validation
+        document.getElementById('editFeedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const validation = validateForm();
+            
+            if (!validation.valid) {
+                // Show validation summary
+                const summary = document.getElementById('validationSummary');
+                const errorsList = document.getElementById('validationErrors');
+                
+                errorsList.innerHTML = '';
+                validation.errors.forEach(error => {
+                    const li = document.createElement('li');
+                    li.textContent = error;
+                    errorsList.appendChild(li);
+                });
+                
+                summary.classList.add('show');
+                summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            // Hide validation summary if form is valid
+            document.getElementById('validationSummary').classList.remove('show');
+            
+            // Submit the form
+            this.submit();
+        });
+    </script>
+</head>
+<body>
+<header>
+    <a href="/feedback/my-feedback" class="btn secondary">← Back</a>
+    <h1>Edit Feedback</h1>
+ </header>
+
+<div class="container" th:if="${feedback}">
+    <form th:action="@{/feedback/edit/{id}(id=${feedback.id})}" method="post" class="form-grid" id="editFeedbackForm" novalidate>
+        <div class="validation-summary" id="validationSummary">
+            <h4>Please fix the following errors:</h4>
+            <ul id="validationErrors"></ul>
+        </div>
+
+        <div class="field">
+            <label>Subject</label>
+            <input type="text" name="subject" id="subject" th:value="${feedback.subject}" required 
+                   minlength="5" maxlength="200" oninput="validateField('subject')" />
+            <div class="field-error" id="subjectError">Subject must be between 5 and 200 characters</div>
+        </div>
+
+        <div class="field">
+            <label>Category</label>
+            <select name="category" id="category" required onchange="validateField('category')">
+                <option value="Service" th:selected="${feedback.category == 'Service'}">Service</option>
+                <option value="Product" th:selected="${feedback.category == 'Product'}">Product</option>
+                <option value="Complaint" th:selected="${feedback.category == 'Complaint'}">Complaint</option>
+                <option value="Suggestion" th:selected="${feedback.category == 'Suggestion'}">Suggestion</option>
+                <option value="Other" th:selected="${feedback.category == 'Other'}">Other</option>
+            </select>
+            <div class="field-error" id="categoryError">Please select a category</div>
+        </div>
+
+        <div class="field">
+            <label>Message</label>
+            <textarea name="message" id="message" required th:text="${feedback.message}" 
+                      minlength="10" maxlength="2000" oninput="validateField('message')"></textarea>
+            <div class="field-error" id="messageError">Message must be between 10 and 2000 characters</div>
+        </div>
+
+        <div class="field">
+            <label>Rating (optional, 1-5)</label>
+            <input type="number" name="rating" id="rating" min="1" max="5" th:value="${feedback.rating}" 
+                   onblur="clampRating(this); validateField('rating')" />
+            <div class="field-error" id="ratingError">Rating must be between 1 and 5</div>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn primary">Save Changes</button>
+            <a href="/feedback/my-feedback" class="btn secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
+
+

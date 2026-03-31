@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Chat Support - Customer Support System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            flex: 1;
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; text-align: center; background: #f7fafc; }
+        .chat-window {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: #f7fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .message {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+            word-wrap: break-word;
+            position: relative;
+        }
+        .message-actions {
+            display: none;
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            gap: 0.5rem;
+        }
+        .message:hover .message-actions {
+            display: flex;
+        }
+        .message-btn {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .edit-btn {
+            background: #fbbf24;
+            color: #78350f;
+        }
+        .edit-btn:hover {
+            background: #f59e0b;
+        }
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+        .edited-indicator {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            font-style: italic;
+            margin-left: 0.5rem;
+        }
+        .user-message { align-self: flex-end; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; }
+        .agent-message { align-self: flex-start; background: #fff; border: 1px solid #e2e8f0; color: #2d3748; }
+        .system-message { align-self: center; background: #edf2f7; color: #4a5568; border-radius: 16px; padding: 0.5rem 1rem; font-style: italic; font-size: 0.85rem; }
+        .chat-input { border-top: 1px solid #e2e8f0; background: #fff; padding: 1rem; display: flex; gap: 1rem; }
+        .message-input { flex: 1; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; resize: none; }
+        .send-button { padding: 1rem 1.5rem; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; border:none; border-radius:12px; cursor:pointer; font-weight:600; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>💬 Live Chat Support</h2>
+    </div>
+
+    <div id="chatWindow" class="chat-window">
+        <div class="system-message">Welcome to live chat! Please wait for an agent to join.</div>
+    </div>
+
+    <div class="chat-input">
+        <textarea id="messageInput" class="message-input" placeholder="Type your message..."></textarea>
+        <button class="send-button" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script th:inline="javascript">
+    const sessionId = /*[[${sessionId}]]*/ 'default-session';
+    const userId = /*[[${userId}]]*/ 1;
+    const username = /*[[${username}]]*/ 'User';
+
+    let stompClient = null;
+    let isConnected = false;
+
+    function connect() {
+        const socket = new SockJS('/chat');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, frame => {
+            console.log('Connected: ' + frame);
+            isConnected = true;
+            subscribeToSession(sessionId);
+            loadChatHistory();
+        });
+    }
+
+    function subscribeToSession(id) {
+        stompClient.subscribe('/topic/chat/' + id, msg => {
+            const data = JSON.parse(msg.body);
+            displayMessage(data);
+        });
+    }
+
+    function loadChatHistory() {
+        fetch('/api/chat/history/' + sessionId)
+            .then(res => res.json())
+            .then(messages => {
+                const chatWindow = document.getElementById('chatWindow');
+                chatWindow.innerHTML = '';
+                messages.forEach(displayMessage);
+                scrollToBottom();
+            });
+    }
+
+    function displayMessage(message) {
+        // Check if message is deleted (strict check)
+        if (message.isDeleted === true) {
+            // Find and remove the message from DOM if it exists
+            const existingMsg = document.querySelector(`[data-message-id="${message.id}"]`);
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+            return;
+        }
+
+        // Check if message already exists (for edit updates)
+        const existingMsg = document.querySelector(`[data-message-id="${message.id}"]`);
+        if (existingMsg) {
+            // Update existing message
+            const contentDiv = existingMsg.querySelector('.message-content');
+            if (contentDiv) {
+                contentDiv.textContent = message.content;
+            }
+            
+            // Update edited indicator
+            const editedIndicator = existingMsg.querySelector('.edited-indicator');
+            if (message.isEdited && !editedIndicator) {
+                const indicator = document.createElement('span');
+                indicator.classList.add('edited-indicator');
+                indicator.textContent = '(edited)';
+                contentDiv.appendChild(indicator);
+            }
+            return;
+        }
+
+        // Create new message
+        const chatWindow = document.getElementById('chatWindow');
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('message');
+        messageContainer.setAttribute('data-message-id', message.id);
+
+        if (message.senderType === 'USER' && message.senderUsername === username) {
+            messageContainer.classList.add('user-message');
+            
+            // Add edit/delete buttons for user's own messages
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('message-actions');
+            
+            const editBtn = document.createElement('button');
+            editBtn.classList.add('message-btn', 'edit-btn');
+            editBtn.textContent = 'Edit';
+            editBtn.onclick = () => editMessage(message.id, message.content);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('message-btn', 'delete-btn');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = () => deleteMessageConfirm(message.id);
+            
+            actionsDiv.appendChild(editBtn);
+            actionsDiv.appendChild(deleteBtn);
+            messageContainer.appendChild(actionsDiv);
+        }
+        else if (message.senderType === 'AGENT') {
+            messageContainer.classList.add('agent-message');
+        }
+        else {
+            messageContainer.classList.add('system-message');
+        }
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('message-content');
+        contentDiv.textContent = message.content;
+        
+        if (message.isEdited) {
+            const editedIndicator = document.createElement('span');
+            editedIndicator.classList.add('edited-indicator');
+            editedIndicator.textContent = '(edited)';
+            contentDiv.appendChild(editedIndicator);
+        }
+        
+        messageContainer.appendChild(contentDiv);
+        chatWindow.appendChild(messageContainer);
+        scrollToBottom();
+    }
+
+    function sendMessage() {
+        const msgInput = document.getElementById('messageInput');
+        const msg = msgInput.value.trim();
+        if (!msg || !isConnected) return;
+
+        stompClient.send('/app/chat.send', {}, JSON.stringify({
+            sessionId, senderId: userId, content: msg, senderType: 'USER'
+        }));
+        msgInput.value = '';
+    }
+
+    function scrollToBottom() {
+        const chatWindow = document.getElementById('chatWindow');
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function editMessage(messageId, currentContent) {
+        const newContent = prompt('Edit your message:', currentContent);
+        if (!newContent || newContent.trim() === '' || newContent === currentContent) {
+            return;
+        }
+
+        console.log('Editing message:', messageId);
+        
+        const requestData = {
+            content: newContent,
+            userId: userId
+        };
+        
+        fetch(`/api/chat/message/${messageId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Message edited successfully');
+                // The real-time update will come through WebSocket
+            } else {
+                alert('Error editing message: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Error editing message: ' + err.message);
+        });
+    }
+
+    function deleteMessageConfirm(messageId) {
+        if (!confirm('Are you sure you want to delete this message?')) {
+            return;
+        }
+
+        console.log('Deleting message:', messageId);
+        
+        fetch(`/api/chat/message/${messageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: userId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Message deleted successfully');
+                // The real-time update will come through WebSocket
+            } else {
+                alert('Error deleting message: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Error deleting message: ' + err.message);
+        });
+    }
+
+    connect();
+</script>
+</body>
+</html>

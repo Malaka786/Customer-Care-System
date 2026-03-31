@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ Management - Agent Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar li a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+            border-radius: 12px;
+        }
+
+        .navbar li a:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .navbar li a:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1.5rem 2rem 2rem;
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-section {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input[type="text"] {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+        }
+
+        .btn-edit {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2f855a;
+            transform: translateY(-1px);
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .faq-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .faq-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .faq-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .faq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .faq-category {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .faq-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .faq-question {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .faq-answer {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .faq-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-section, .search-section {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            select, input[type="text"] {
+                min-width: auto;
+                flex: 1;
+            }
+
+            .faq-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .faq-actions {
+                justify-content: flex-end;
+            }
+
+            .faq-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">🏠 Home</a></li>
+            <li><a href="/agent/dashboard">📞 Dashboard</a></li>
+            <li><a href="/agent/tickets">📋 View Tickets</a></li>
+            <li><a href="/agent/faq">❓ Manage FAQ</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+    </nav>
+    <h1>❓ FAQ Management</h1>
+</header>
+
+<div class="container">
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <!-- Controls Section -->
+    <div class="controls">
+        <div class="filter-section">
+            <label for="categoryFilter" style="font-weight: 600;">Filter by Category:</label>
+            <select id="categoryFilter" onchange="filterByCategory()">
+                <option value="all" th:selected="${selectedCategory == null or selectedCategory == 'all'}">All Categories</option>
+                <option th:each="category : ${categories}" 
+                        th:value="${category}" 
+                        th:text="${category}"
+                        th:selected="${selectedCategory == category}"></option>
+            </select>
+        </div>
+
+        <div class="search-section">
+            <form action="/agent/faq/search" method="get" style="display: flex; gap: 1rem; align-items: center;">
+                <input type="text" name="keyword" placeholder="Search FAQs..." th:value="${searchKeyword}">
+                <input type="hidden" name="category" th:value="${selectedCategory}">
+                <button type="submit" class="btn btn-secondary">🔍 Search</button>
+            </form>
+            <a href="/agent/faq/add" class="btn btn-primary">➕ Add New FAQ</a>
+        </div>
+    </div>
+
+    <!-- FAQ Grid -->
+    <div class="faq-grid" th:if="${not #lists.isEmpty(faqs)}">
+        <div class="faq-card" th:each="faq : ${faqs}">
+            <div class="faq-header">
+                <div class="faq-category" th:text="${faq.category}">Category</div>
+                <div class="faq-actions">
+                    <a th:href="@{/agent/faq/edit/{id}(id=${faq.id})}" class="btn btn-edit">✏️ Edit</a>
+                    <form th:action="@{/agent/faq/delete/{id}(id=${faq.id})}" method="post" style="display: inline;"
+                          onsubmit="return confirm('Are you sure you want to delete this FAQ?')">
+                        <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+                    </form>
+                </div>
+            </div>
+            
+            <h3 class="faq-question" th:text="${faq.question}">Question goes here</h3>
+            <div class="faq-answer" th:text="${faq.answer}">Answer goes here</div>
+            
+            <div class="faq-meta">
+                <span>Created: <span th:text="${#temporals.format(faq.createdAt, 'dd MMM yyyy HH:mm')}">Date</span></span>
+                <span th:if="${faq.updatedAt != null and faq.updatedAt != faq.createdAt}">
+                    Updated: <span th:text="${#temporals.format(faq.updatedAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" th:if="${#lists.isEmpty(faqs)}">
+        <div class="empty-state-icon">❓</div>
+        <h3>No FAQ Articles Found</h3>
+        <p th:if="${searchKeyword != null}">No FAQs match your search criteria. Try a different keyword or category.</p>
+        <p th:if="${searchKeyword == null}">Start building your knowledge base by adding your first FAQ article.</p>
+        <a href="/agent/faq/add" class="btn btn-primary">➕ Add Your First FAQ</a>
+    </div>
+</div>
+
+<script>
+    function filterByCategory() {
+        const select = document.getElementById('categoryFilter');
+        const category = select.value;
+        
+        if (category === 'all') {
+            window.location.href = '/agent/faq';
+        } else {
+            window.location.href = '/agent/faq?category=' + encodeURIComponent(category);
+        }
+    }
+
+    // Auto-hide success/error messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        });
+    });
+</script>
+</body>
+</html>
